@@ -1,15 +1,19 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Εισαγωγή του εργαλείου πλοήγησης
+import { useNavigate } from 'react-router-dom';
 
 function LoginPage() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const navigate = useNavigate(); // Αρχικοποίηση της πλοήγησης
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        
+        // Καθαρίζουμε τα παλιά/λάθος tokens για να ξεκινήσουμε καθαρά
+        localStorage.clear();
+
         try {
             const response = await axios.post('http://127.0.0.1:5001/login', {
                 username,
@@ -17,7 +21,9 @@ function LoginPage() {
             });
             
             if (response.data.status === 'success') {
-                // Αν η σύνδεση πετύχει, στέλνουμε τον χρήστη στο Dashboard
+                localStorage.setItem('token', response.data.token);
+                localStorage.setItem('user', JSON.stringify(response.data.user));
+                
                 navigate('/dashboard');
             }
         } catch (err) {
@@ -52,43 +58,9 @@ function LoginPage() {
     );
 }
 
-// Μερικά απλά στυλ για να φαίνεται πιο όμορφη η σελίδα
-const containerStyle = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100vh',
-    backgroundColor: '#f0f2f5'
-};
-
-const loginBoxStyle = {
-    padding: '40px',
-    backgroundColor: 'white',
-    borderRadius: '10px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-    textAlign: 'center',
-    width: '350px'
-};
-
-const inputStyle = {
-    width: '100%',
-    padding: '12px',
-    margin: '10px 0',
-    borderRadius: '5px',
-    border: '1px solid #ccc',
-    boxSizing: 'border-box'
-};
-
-const buttonStyle = {
-    width: '100%',
-    padding: '12px',
-    backgroundColor: '#3498db',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '16px',
-    marginTop: '10px'
-};
+const containerStyle = { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f0f2f5' };
+const loginBoxStyle = { padding: '40px', backgroundColor: 'white', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', textAlign: 'center', width: '350px' };
+const inputStyle = { width: '100%', padding: '12px', margin: '10px 0', borderRadius: '5px', border: '1px solid #ccc', boxSizing: 'border-box' };
+const buttonStyle = { width: '100%', padding: '12px', backgroundColor: '#3498db', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '16px', marginTop: '10px' };
 
 export default LoginPage;
